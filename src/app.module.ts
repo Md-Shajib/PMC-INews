@@ -20,7 +20,7 @@ import { join } from 'path';
         username: configService.get('DATABASE_USERNAME'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
-        entities: [join(process.cwd(), 'dist/**/*.entity.ts')],
+        entities: [join(process.cwd(), 'dist/**/*.entity{.ts,.js}')],
         synchronize: true,
       }),
       inject: [ConfigService],
