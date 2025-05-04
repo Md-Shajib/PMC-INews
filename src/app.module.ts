@@ -5,6 +5,7 @@ import { UsersModule } from './users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
+import { NewsPostModule } from './news-post/news-post.module';
 
 @Module({
   imports: [
@@ -25,7 +26,8 @@ import { join } from 'path';
       }),
       inject: [ConfigService],
     }),
-    UsersModule
+    UsersModule,
+    NewsPostModule
   ],
   controllers: [AppController],
   providers: [AppService],
