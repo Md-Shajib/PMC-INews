@@ -6,6 +6,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { NewsPostModule } from './news-post/news-post.module';
+import { CommentModule } from './comment/comment.module';
+import { ReactModule } from './react/react.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -27,7 +30,10 @@ import { NewsPostModule } from './news-post/news-post.module';
       inject: [ConfigService],
     }),
     UsersModule,
-    NewsPostModule
+    NewsPostModule,
+    CommentModule,
+    ReactModule,
+    CategoryModule
   ],
   controllers: [AppController],
   providers: [AppService],
