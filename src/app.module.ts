@@ -9,6 +9,7 @@ import { NewsPostModule } from './news-post/news-post.module';
 import { CommentModule } from './comment/comment.module';
 import { ReactModule } from './react/react.module';
 import { CategoryModule } from './category/category.module';
+import { AuthorModule } from './author/author.module';
 
 @Module({
   imports: [
@@ -33,7 +34,8 @@ import { CategoryModule } from './category/category.module';
     NewsPostModule,
     CommentModule,
     ReactModule,
-    CategoryModule
+    CategoryModule,
+    AuthorModule
   ],
   controllers: [AppController],
   providers: [AppService],
