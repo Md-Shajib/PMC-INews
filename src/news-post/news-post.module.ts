@@ -3,12 +3,13 @@ import { NewsPostService } from './news-post.service';
 import { NewsPostController } from './news-post.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NewsPost } from './entities/news-post.entity';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([NewsPost])
+    TypeOrmModule.forFeature([NewsPost]),
   ],
   controllers: [NewsPostController],
-  providers: [NewsPostService],
+  providers: [NewsPostService, JwtService],
 })
 export class NewsPostModule {}

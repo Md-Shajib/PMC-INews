@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -10,6 +10,9 @@ import { CommentModule } from './comment/comment.module';
 import { ReactModule } from './react/react.module';
 import { CategoryModule } from './category/category.module';
 import { AuthorModule } from './author/author.module';
+import { AuthModule } from './auth/auth.module';
+import { AuthGuard } from './auth/auth.guard';
+
 
 @Module({
   imports: [
@@ -35,7 +38,8 @@ import { AuthorModule } from './author/author.module';
     CommentModule,
     ReactModule,
     CategoryModule,
-    AuthorModule
+    AuthorModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],

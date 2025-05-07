@@ -1,6 +1,7 @@
 import { IsEmail, IsString, Matches, MaxLength, MinLength } from "class-validator";
 import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import * as bcrypt from 'bcryptjs';
+import { Role } from "src/auth/enum/role.enume";
 
 
 @Entity({name: 'users'})
@@ -24,7 +25,7 @@ export class User {
     password: string;
 
     @Column({default: 'user'})
-    role: string;
+    role: Role;
 
     @BeforeInsert()
     @BeforeUpdate()

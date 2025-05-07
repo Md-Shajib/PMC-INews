@@ -94,7 +94,7 @@ export class UsersService {
   }
 
   async findOne(identifier: string) {
-    const isEmail = identifier.includes('@');
+    const isEmail = identifier?.includes('@');
     const isValidUuid = isUuid(identifier);
     
     if (!isEmail && !isValidUuid) {
