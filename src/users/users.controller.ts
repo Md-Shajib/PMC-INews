@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -21,16 +21,15 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @Post('login')
-  login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
-    return this.usersService.login(loginDto, res);
-  }
+  // @Post('login')
+  // login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
+  //   return this.usersService.login(loginDto, res);
+  // }
   
-  @Get('user')
-  user(@Req() request: Request) {
-    return this.usersService.user(request);
-  }
-
+  // @Get('user')
+  // user(@Req() request: Request) {
+  //   return this.usersService.user(request);
+  // }
 
 
   @Post('logout')

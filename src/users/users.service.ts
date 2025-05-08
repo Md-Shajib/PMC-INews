@@ -42,44 +42,44 @@ export class UsersService {
     }
   }
 
-  async login(loginDto: LoginDto, @Res({ passthrough: true }) response: Response) {
-    const { email, password } = loginDto;
-    const user = await this.findOne(email)
-    if (!user || !await bcrypt.compare(password, user.password)) {
-      throw new BadRequestException('Invalid email or passwoar')
-    }
-    // if(await bcrypt.compare(password, user.password)){
-    //   return user;
-    // }
+  // async login(loginDto: LoginDto, @Res({ passthrough: true }) response: Response) {
+  //   const { email, password } = loginDto;
+  //   const user = await this.findOne(email)
+  //   if (!user || !await bcrypt.compare(password, user.password)) {
+  //     throw new BadRequestException('Invalid email or passwoar')
+  //   }
+  //   // if(await bcrypt.compare(password, user.password)){
+  //   //   return user;
+  //   // }
 
-    const jwt = await this.jwtService.signAsync({ id: user.id })
+  //   const jwt = await this.jwtService.signAsync({ id: user.id })
 
-    response.cookie('jwt', jwt, { httpOnly: true });
+  //   response.cookie('jwt', jwt, { httpOnly: true });
 
-    return {
-      message: 'successfully login'
-    };
-  }
+  //   return {
+  //     message: 'successfully login'
+  //   };
+  // }
 
-  async user(@Req() request: Request) {
-    try {
-      const cookie = request.cookies['jwt'];
-      // console.log(cookie)
-      const data = await this.jwtService.verifyAsync(cookie);
+  // async user(@Req() request: Request) {
+  //   try {
+  //     const cookie = request.cookies['jwt'];
+  //     // console.log(cookie)
+  //     const data = await this.jwtService.verifyAsync(cookie);
 
-      if (!data) {
-        throw new UnauthorizedException();
-      }
+  //     if (!data) {
+  //       throw new UnauthorizedException();
+  //     }
 
-      const identifier = data['id'];
-      const userData = await this.findOne(identifier);
+  //     const identifier = data['id'];
+  //     const userData = await this.findOne(identifier);
 
-      return userData;
+  //     return userData;
 
-    } catch (e) {
-      throw new UnauthorizedException();
-    }
-  }
+  //   } catch (e) {
+  //     throw new UnauthorizedException();
+  //   }
+  // }
 
   async logout(response: Response) {
     response.clearCookie('jwt');
