@@ -12,7 +12,7 @@ export class ReactController {
     return this.reactService.create(createReactDto);
   }
 
-  @Get(':post_id/reacts')
+  @Get(':post_id/react')
   findAll(@Param('post_id') post_id: string) {
     return this.reactService.findAll(post_id);
   }

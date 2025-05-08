@@ -20,7 +20,7 @@ export class NewsPostController {
     return this.newsPostService.create(createNewsPostDto);
   }
 
-  @Get()
+  @Get('all')
   findAll() {
     return this.newsPostService.findAll();
   }
@@ -30,12 +30,12 @@ export class NewsPostController {
     return this.newsPostService.findOne(id);
   }
 
-  @Patch(':id')
+  @Patch(':id/update')
   update(@Param('id') id: string, @Body() updateNewsPostDto: UpdateNewsPostDto) {
     return this.newsPostService.update(id, updateNewsPostDto);
   }
 
-  @Delete(':id')
+  @Delete(':id/delete')
   remove(@Param('id') id: string) {
     return this.newsPostService.remove(id);
   }

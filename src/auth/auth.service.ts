@@ -17,8 +17,6 @@ export class AuthService {
 
     const user = await this.usersService.findOne(email);
     // console.log(user);
-    
-
     if(!user) {
         throw new UnauthorizedException("User not found");
     }
@@ -27,9 +25,10 @@ export class AuthService {
     if (!isPasswordMatched) {
       throw new UnauthorizedException("Wrong Password");
     }
-    const payload = {id: user.id, email: user.email, password: user.password, role: user.role };
+    const payload = {id: user.id, email: user.email, role: user.role };
+    const access_token = await this.jwtService.signAsync(payload);
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      access_token: access_token
     };
   }
 }
