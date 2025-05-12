@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { Request } from 'express';
 import { validate as isUuid } from 'uuid';
+import { Role } from 'src/auth/enum/role.enume';
 
 @Injectable()
 export class UsersService {
@@ -21,16 +22,10 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
-      // Create a new user entity with the DTO data
-      const newUser = this.usersRepository.create(createUserDto);
-
-      // console.log(newUser);
-
-      // Save the user to the database
+      const newUser = this.usersRepository.create({
+        ...createUserDto, role: Role.User,
+      });
       const savedUser = await this.usersRepository.save(newUser);
-
-      // Return the saved user (typically without the password)
-      // You may want to exclude sensitive fields before returning
       const { password, ...result } = savedUser;
       return result as User;
 
@@ -41,45 +36,6 @@ export class UsersService {
       throw new Error(`Failed to create user: ${error.message}`);
     }
   }
-
-  // async login(loginDto: LoginDto, @Res({ passthrough: true }) response: Response) {
-  //   const { email, password } = loginDto;
-  //   const user = await this.findOne(email)
-  //   if (!user || !await bcrypt.compare(password, user.password)) {
-  //     throw new BadRequestException('Invalid email or passwoar')
-  //   }
-  //   // if(await bcrypt.compare(password, user.password)){
-  //   //   return user;
-  //   // }
-
-  //   const jwt = await this.jwtService.signAsync({ id: user.id })
-
-  //   response.cookie('jwt', jwt, { httpOnly: true });
-
-  //   return {
-  //     message: 'successfully login'
-  //   };
-  // }
-
-  // async user(@Req() request: Request) {
-  //   try {
-  //     const cookie = request.cookies['jwt'];
-  //     // console.log(cookie)
-  //     const data = await this.jwtService.verifyAsync(cookie);
-
-  //     if (!data) {
-  //       throw new UnauthorizedException();
-  //     }
-
-  //     const identifier = data['id'];
-  //     const userData = await this.findOne(identifier);
-
-  //     return userData;
-
-  //   } catch (e) {
-  //     throw new UnauthorizedException();
-  //   }
-  // }
 
   async logout(response: Response) {
     response.clearCookie('jwt');
@@ -100,10 +56,12 @@ export class UsersService {
     if (!isEmail && !isValidUuid) {
       throw new BadRequestException('Invalid identifier');
     }
-  
-    return await this.usersRepository.findOne({
+    const foundUser = await this.usersRepository.findOne({
       where: isEmail ? { email: identifier } : { id: identifier }
     });
+    if(!foundUser) throw new NotFoundException("User Not Found");
+
+    return foundUser
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
@@ -116,6 +74,8 @@ export class UsersService {
 
     return await this.usersRepository.save(user);
   }
+
+
 
   async remove(id: string) {
     const user = await this.findOne(id);

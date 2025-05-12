@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -8,7 +8,13 @@ import { Res } from '@nestjs/common';
 import { response, Response } from 'express';
 import { Request } from 'express';
 import * as cookieParser from 'cookie-parser';
+import { Public, Roles } from 'src/auth/decorators/roles.decorator';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Role } from 'src/auth/enum/role.enume';
 
+@UseGuards(AuthGuard)
+@UseGuards(RolesGuard)
 @Controller('users')
 export class UsersController {
   constructor(
@@ -16,21 +22,11 @@ export class UsersController {
     private jwtService: JwtService
   ) {}
 
+  @Public()
   @Post('register')
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
-
-  // @Post('login')
-  // login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
-  //   return this.usersService.login(loginDto, res);
-  // }
-  
-  // @Get('user')
-  // user(@Req() request: Request) {
-  //   return this.usersService.user(request);
-  // }
-
 
   @Post('logout')
   logout(@Res({ passthrough: true }) response: Response) {
@@ -38,21 +34,27 @@ export class UsersController {
   }
   
   @Get('all')
+  @Roles(Role.Admin)
   findAll() {
     return this.usersService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+  @Roles(Role.Admin, Role.Author, Role.User)
+  async findOne(@Param('id') id: string) {
+    const getUser = await this.usersService.findOne(id);
+    const { password, ...userWithoutPass} = getUser;
+    return userWithoutPass;
   }
 
   @Patch(':id/update')
+  @Roles(Role.Admin, Role.Author, Role.User)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id/delete')
+  @Roles(Role.Admin, Role.Author, Role.User)
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
   }
