@@ -3,6 +3,7 @@ import { Injectable, Param, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -26,7 +27,10 @@ export class AuthService {
       throw new UnauthorizedException("Wrong Password");
     }
     const payload = {id: user.id, email: user.email, role: user.role };
-    const access_token = await this.jwtService.signAsync(payload);
+    const access_token = await this.jwtService.signAsync(payload, {
+      expiresIn: process.env.JWT_EXPIRES_IN,
+    });
+
     return {
       access_token: access_token
     };

@@ -1,13 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards
+} from '@nestjs/common';
 import { NewsPostService } from './news-post.service';
 import { CreateNewsPostDto } from './dto/create-news-post.dto';
 import { UpdateNewsPostDto } from './dto/update-news-post.dto';
-import { Roles } from 'src/auth/roles.decorator';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/enum/role.enume';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 
 @UseGuards(AuthGuard)
+@UseGuards(RolesGuard)
+@Roles(Role.Admin, Role.Author)
 @Controller('news-post')
 export class NewsPostController {
   constructor(private readonly newsPostService: NewsPostService) {}
@@ -15,8 +26,6 @@ export class NewsPostController {
   @Post()
   @Roles(Role.Author)
   create(@Body() createNewsPostDto: CreateNewsPostDto) {
-    console.log();
-    
     return this.newsPostService.create(createNewsPostDto);
   }
 

@@ -11,7 +11,6 @@ import { ReactModule } from './react/react.module';
 import { CategoryModule } from './category/category.module';
 import { AuthorModule } from './author/author.module';
 import { AuthModule } from './auth/auth.module';
-import { AuthGuard } from './auth/auth.guard';
 
 
 @Module({
