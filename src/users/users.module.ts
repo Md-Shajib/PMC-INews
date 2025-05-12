@@ -12,7 +12,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
     TypeOrmModule.forFeature([User]),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: {expiresIn: '30d'}
+      signOptions: {expiresIn: '2h'}
     })
   ],
   controllers: [UsersController],
@@ -23,6 +23,6 @@ import { AuthGuard } from 'src/auth/auth.guard';
     },
     UsersService
   ],
-  exports: [UsersService],
+  exports: [UsersService, TypeOrmModule],
 })
 export class UsersModule {}

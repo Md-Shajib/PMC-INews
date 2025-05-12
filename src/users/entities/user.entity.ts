@@ -25,7 +25,7 @@ export class User {
     password: string;
 
     @Column({default: 'user'})
-    role: Role.User;
+    role: Role;
 
     @BeforeInsert()
     @BeforeUpdate()
