@@ -33,15 +33,20 @@ export class NewsPostController {
     return this.newsPostService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.newsPostService.findOne(id);
-  }
-
   @Get('count/total')
   @Roles(Role.Admin)
   countPost(){
     return this.newsPostService.countPost()
+  }
+
+  @Get('topview/:daysAgo')
+  getTopViewFromDaysAgo(@Param('daysAgo') daysAgo: number ){
+    return this.newsPostService.getTopViewFromDaysAgo(daysAgo);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.newsPostService.findOne(id);
   }
 
   @Get(':authorId/count/total')

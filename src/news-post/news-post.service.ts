@@ -3,7 +3,7 @@ import { CreateNewsPostDto } from './dto/create-news-post.dto';
 import { UpdateNewsPostDto } from './dto/update-news-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { NewsPost } from './entities/news-post.entity';
-import { Repository } from 'typeorm';
+import { MoreThanOrEqual, Repository } from 'typeorm';
 
 @Injectable()
 export class NewsPostService {
@@ -80,6 +80,21 @@ export class NewsPostService {
       throw new NotFoundException("No post yet!");
     }
     return posts;
+  }
+
+  async getTopViewFromDaysAgo(daysAgo: number){
+    daysAgo = Number(daysAgo);
+    if (typeof daysAgo !== 'number' || isNaN(daysAgo)) {
+      throw new Error('Invalid daysAgo value');
+    }
+    const fromDate = new Date();
+    fromDate.setDate(fromDate.getDate()-daysAgo);
+    return await this.newsPostRepository.findOne({
+      where: {
+        post_date: MoreThanOrEqual(fromDate),
+      },
+      order: {view_count: 'DESC'}
+    });
   }
 
   async update(id: string, updateNewsPostDto: UpdateNewsPostDto) {
