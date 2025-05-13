@@ -25,6 +25,12 @@ export class CategoryController {
     return this.categoryService.findAll();
   }
 
+  @Get('count/total')
+  @Roles(Role.Admin)
+  countCategory() {
+    return this.categoryService.countCategory();
+  }
+
   @Get(':id/category')
   @Roles(Role.Admin, Role.Author)
   findOne(@Param('id') id: string) {

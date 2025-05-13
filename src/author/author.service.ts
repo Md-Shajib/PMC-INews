@@ -56,6 +56,10 @@ export class AuthorService {
     return author;
   }
 
+  async countAuthor(){
+    return this.authorRepository.count();
+  }
+
   async update(author_id: string, updateAuthorDto: UpdateAuthorDto) {
     const author = await this.findOne(author_id);
     if(!author){

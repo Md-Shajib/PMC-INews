@@ -30,6 +30,14 @@ export class CategoryService {
     return await this.categoryRepository.find();
   }
 
+  async countCategory(){
+    const totalCategory = await this.categoryRepository.count();
+    if(!totalCategory){
+      throw new NotFoundException("No category yet!");
+    }
+    return totalCategory;
+  }
+
   async findOne(id: string) {
     return await this.categoryRepository.findOne({
       where: {id}

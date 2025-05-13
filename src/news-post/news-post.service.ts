@@ -33,6 +33,14 @@ export class NewsPostService {
     });
   }
 
+  async countPost(){
+    const totalPost = this.newsPostRepository.count();
+    if(!totalPost){
+      throw new NotFoundException("No post yet!");
+    }
+    return totalPost;
+  }
+
   async views(id: string){
     const postViews = await this.newsPostRepository.findOne({
       select: ['view_count'],
@@ -52,6 +60,26 @@ export class NewsPostService {
     post.view_count += 1;
     await this.newsPostRepository.save(post);
     return post.view_count;
+  }
+
+  async countAuthorPost(authorId: string){
+    const totalPosts = await this.newsPostRepository.count({
+      where: {author_id: authorId}
+    })
+    if(!totalPosts){
+      throw new NotFoundException("No post yet!");
+    }
+    return totalPosts;
+  }
+
+  async authorPosts(authorId: string){
+    const posts = await this.newsPostRepository.find({
+      where: {author_id: authorId}
+    })
+    if(!posts){
+      throw new NotFoundException("No post yet!");
+    }
+    return posts;
   }
 
   async update(id: string, updateNewsPostDto: UpdateNewsPostDto) {

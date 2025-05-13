@@ -24,7 +24,6 @@ export class NewsPostController {
   constructor(private readonly newsPostService: NewsPostService) {}
 
   @Post()
-  @Roles(Role.Author)
   create(@Body() createNewsPostDto: CreateNewsPostDto) {
     return this.newsPostService.create(createNewsPostDto);
   }
@@ -37,6 +36,22 @@ export class NewsPostController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.newsPostService.findOne(id);
+  }
+
+  @Get('count/total')
+  @Roles(Role.Admin)
+  countPost(){
+    return this.newsPostService.countPost()
+  }
+
+  @Get(':authorId/count/total')
+  countAuthorPost(@Param('authorId') authorId: string){
+    return this.newsPostService.countAuthorPost(authorId);
+  }
+
+  @Get(':authorId/posts/all')
+  authorPosts(@Param('authorId') authorId: string){
+    return this.newsPostService.authorPosts(authorId);
   }
 
   @Get(':id/views')

@@ -27,6 +27,13 @@ export class AuthorController {
     return this.authorService.findAll();
   }
 
+  @Get('count/total')
+  @Roles(Role.Admin)
+  countAuthor(){
+    const totalAuthor = this.authorService.countAuthor();
+    return totalAuthor;
+  }
+
   @Get(':author_id')
   @Roles(Role.Admin, Role.Author)
   findOne(@Param('author_id') author_id: string) {
