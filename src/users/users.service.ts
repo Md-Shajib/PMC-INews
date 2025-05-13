@@ -64,6 +64,10 @@ export class UsersService {
     return foundUser
   }
 
+  async userCount(){
+    return await this.usersRepository.count();
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto) {
     const user = await this.findOne(id);
     if (!user) {

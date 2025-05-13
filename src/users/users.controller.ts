@@ -47,6 +47,13 @@ export class UsersController {
     return userWithoutPass;
   }
 
+  @Get('count/total')
+  @Roles(Role.Admin)
+  async userCount(){
+    const totalUser = await this.usersService.userCount();
+    return totalUser;
+  }
+
   @Patch(':id/update')
   @Roles(Role.Admin, Role.Author, Role.User)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {

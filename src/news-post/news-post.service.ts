@@ -44,14 +44,15 @@ export class NewsPostService {
     return postViews;
   }
 
-  // async viewIncrement(id: string): Promise<number | null> {
-  //   const post = await this.views(id); // ✅ Await the post
-  //   if (!post) return null;
-  //   console.log(post)
-  //   post.view_count += 1;
-  //   await this.newsPostRepository.save(post); // ✅ Save the updated post
-  //   return post.view_count;
-  // }
+  async viewIncrement(id: string): Promise<number | null> {
+    const post = await this.findOne(id);
+    if (!post){
+      throw new NotFoundException("Post not found");
+    }
+    post.view_count += 1;
+    await this.newsPostRepository.save(post);
+    return post.view_count;
+  }
 
   async update(id: string, updateNewsPostDto: UpdateNewsPostDto) {
     const post = await this.findOne(id);

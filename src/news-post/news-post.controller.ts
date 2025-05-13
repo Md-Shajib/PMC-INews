@@ -44,10 +44,11 @@ export class NewsPostController {
     return this.newsPostService.views(id);
   }
 
-  // @Post(':id/view/increment')
-  // viewIncrement(@Param('id') id: string){
-  //   return this.newsPostService.viewIncrement(id);
-  // }
+  @Post(':id/view/increment')
+  @Roles(Role.Admin, Role.Author, Role.User)
+  viewIncrement(@Param('id') id: string){
+    return this.newsPostService.viewIncrement(id);
+  }
 
   @Patch(':id/update')
   update(@Param('id') id: string, @Body() updateNewsPostDto: UpdateNewsPostDto) {
