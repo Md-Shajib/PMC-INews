@@ -4,6 +4,7 @@ import { UpdateNewsPostDto } from './dto/update-news-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { NewsPost } from './entities/news-post.entity';
 import { MoreThanOrEqual, Repository } from 'typeorm';
+import { paginate, IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class NewsPostService {
@@ -13,6 +14,10 @@ export class NewsPostService {
     private newsPostRepository: Repository<NewsPost>
   ){}
 
+  async paginate(options: IPaginationOptions): Promise<Pagination<NewsPost>> {
+    return paginate<NewsPost>(this.newsPostRepository, options);
+  }
+  
   async create(createNewsPostDto: CreateNewsPostDto): Promise<NewsPost> {
     try{
       const newPost = this.newsPostRepository.create(createNewsPostDto);

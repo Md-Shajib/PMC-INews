@@ -5,7 +5,8 @@ import { Controller,
   Patch,
   Param,
   Delete,
-  UseGuards
+  UseGuards,
+  Query
 } from '@nestjs/common';
 import { NewsPostService } from './news-post.service';
 import { CreateNewsPostDto } from './dto/create-news-post.dto';
@@ -14,6 +15,8 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/enum/role.enume';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Pagination } from 'nestjs-typeorm-paginate';
+import { NewsPost } from './entities/news-post.entity';
 
 
 @UseGuards(AuthGuard)
@@ -29,8 +32,12 @@ export class NewsPostController {
   }
 
   @Get('all')
-  findAll() {
-    return this.newsPostService.findAll();
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<Pagination<NewsPost>> {
+    limit = limit > 100 ? 100 : limit; // optional max limit safeguard
+    return this.newsPostService.paginate({ page, limit });
   }
 
   @Get('count/total')

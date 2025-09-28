@@ -6,6 +6,7 @@ import { Author } from './entities/author.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/auth/enum/role.enume';
+import { paginate ,IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class AuthorService {
@@ -17,6 +18,10 @@ export class AuthorService {
     @InjectRepository(User)
     private userRepository: Repository<User>
   ) {}
+
+  async paginate(options: IPaginationOptions): Promise<Pagination<Author>> {
+    return paginate<Author>(this.authorRepository, options);
+  }
 
   async create(createAuthorDto: CreateAuthorDto): Promise<Author> {
     try{

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { AuthorService } from './author.service';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-author.dto';
@@ -8,6 +8,8 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/enum/role.enume';
+import { Pagination } from 'nestjs-typeorm-paginate';
+import { Author } from './entities/author.entity';
 
 @UseGuards(AuthGuard)
 @UseGuards(RolesGuard)
@@ -23,8 +25,12 @@ export class AuthorController {
 
   @Get('all')
   @Roles(Role.Admin)
-  findAll() {
-    return this.authorService.findAll();
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit : number = 10,
+  ): Promise<Pagination<Author>> {
+    limit = limit > 100 ? 100 : limit;
+    return this.authorService.paginate({page, limit});
   }
 
   @Get('count/total')

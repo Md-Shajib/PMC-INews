@@ -1,0 +1,15 @@
+{
+    "sqltools.connections": [
+        {
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5434,
+            "driver": "PostgreSQL",
+            "username": "postgres",
+            "database": "inewsdb",
+            "password": "root",
+            "name": "inewsdb"
+        }
+    ]
+}
