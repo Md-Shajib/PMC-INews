@@ -1,6 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { NewsStatus } from "../dto/create-news-post.dto";
-import { IsDateString, IsInt } from "class-validator";
 
 
 @Entity({name: 'news_post'})

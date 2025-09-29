@@ -4,27 +4,30 @@ import { UpdateNewsPostDto } from './dto/update-news-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { NewsPost } from './entities/news-post.entity';
 import { MoreThanOrEqual, Repository } from 'typeorm';
-import { paginate, IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
+import {
+  paginate,
+  IPaginationOptions,
+  Pagination,
+} from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class NewsPostService {
-
   constructor(
     @InjectRepository(NewsPost)
-    private newsPostRepository: Repository<NewsPost>
-  ){}
+    private newsPostRepository: Repository<NewsPost>,
+  ) {}
 
   async paginate(options: IPaginationOptions): Promise<Pagination<NewsPost>> {
     return paginate<NewsPost>(this.newsPostRepository, options);
   }
-  
+
   async create(createNewsPostDto: CreateNewsPostDto): Promise<NewsPost> {
-    try{
+    try {
       const newPost = this.newsPostRepository.create(createNewsPostDto);
       const savedPost = await this.newsPostRepository.save(newPost);
       return savedPost as NewsPost;
-    }catch(error){
-      throw new Error(`Failed to create post: ${error.message}`)
+    } catch (error) {
+      throw new Error(`Failed to create post: ${error.message}`);
     }
   }
 
@@ -34,77 +37,89 @@ export class NewsPostService {
 
   async findOne(id: string) {
     return await this.newsPostRepository.findOne({
-      where: {id}
+      where: { id },
     });
   }
 
-  async countPost(){
+  async countPost() {
     const totalPost = this.newsPostRepository.count();
-    if(!totalPost){
-      throw new NotFoundException("No post yet!");
+    if (!totalPost) {
+      throw new NotFoundException('No post yet!');
     }
     return totalPost;
   }
 
-  async views(id: string){
+  async views(id: string) {
     const postViews = await this.newsPostRepository.findOne({
       select: ['view_count'],
-      where: {id},
-    })
-    if(!postViews){
-      throw new NotFoundException("No view yet");
+      where: { id },
+    });
+    if (!postViews) {
+      throw new NotFoundException('No view yet');
     }
     return postViews;
   }
 
   async viewIncrement(id: string): Promise<number | null> {
     const post = await this.findOne(id);
-    if (!post){
-      throw new NotFoundException("Post not found");
+    if (!post) {
+      throw new NotFoundException('Post not found');
     }
     post.view_count += 1;
     await this.newsPostRepository.save(post);
     return post.view_count;
   }
 
-  async countAuthorPost(authorId: string){
+  async countAuthorPost(authorId: string) {
     const totalPosts = await this.newsPostRepository.count({
-      where: {author_id: authorId}
-    })
-    if(!totalPosts){
-      throw new NotFoundException("No post yet!");
+      where: { author_id: authorId },
+    });
+    if (!totalPosts) {
+      throw new NotFoundException('No post yet!');
     }
     return totalPosts;
   }
 
-  async authorPosts(authorId: string){
+  async paginatePublished(
+    status: string,
+    options: IPaginationOptions,
+  ): Promise<Pagination<NewsPost>> {
+    const queryBuilder = this.newsPostRepository.createQueryBuilder('news');
+    // Use alias `news` here
+    queryBuilder.where('news.news_status = :status', { status });
+    // Order by post_date or created column
+    queryBuilder.orderBy('news.post_date', 'DESC');
+    return paginate<NewsPost>(queryBuilder, options);
+  }
+
+  async authorPosts(authorId: string) {
     const posts = await this.newsPostRepository.find({
-      where: {author_id: authorId}
-    })
-    if(!posts){
-      throw new NotFoundException("No post yet!");
+      where: { author_id: authorId },
+    });
+    if (!posts) {
+      throw new NotFoundException('No post yet!');
     }
     return posts;
   }
 
-  async getTopViewFromDaysAgo(daysAgo: number){
+  async getTopViewFromDaysAgo(daysAgo: number) {
     daysAgo = Number(daysAgo);
     if (typeof daysAgo !== 'number' || isNaN(daysAgo)) {
       throw new Error('Invalid daysAgo value');
     }
     const fromDate = new Date();
-    fromDate.setDate(fromDate.getDate()-daysAgo);
+    fromDate.setDate(fromDate.getDate() - daysAgo);
     return await this.newsPostRepository.findOne({
       where: {
         post_date: MoreThanOrEqual(fromDate),
       },
-      order: {view_count: 'DESC'}
+      order: { view_count: 'DESC' },
     });
   }
 
   async update(id: string, updateNewsPostDto: UpdateNewsPostDto) {
     const post = await this.findOne(id);
-    if(!post){
+    if (!post) {
       throw new NotFoundException();
     }
     Object.assign(post, updateNewsPostDto);
@@ -113,7 +128,7 @@ export class NewsPostService {
 
   async remove(id: string) {
     const post = await this.findOne(id);
-    if(!post){
+    if (!post) {
       throw new NotFoundException();
     }
     return this.newsPostRepository.remove(post);

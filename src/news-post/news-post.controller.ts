@@ -1,4 +1,5 @@
-import { Controller,
+import {
+  Controller,
   Get,
   Post,
   Body,
@@ -6,7 +7,7 @@ import { Controller,
   Param,
   Delete,
   UseGuards,
-  Query
+  Query,
 } from '@nestjs/common';
 import { NewsPostService } from './news-post.service';
 import { CreateNewsPostDto } from './dto/create-news-post.dto';
@@ -17,7 +18,6 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { NewsPost } from './entities/news-post.entity';
-
 
 @UseGuards(AuthGuard)
 @UseGuards(RolesGuard)
@@ -40,14 +40,46 @@ export class NewsPostController {
     return this.newsPostService.paginate({ page, limit });
   }
 
+  // admin (all published)
+  @Get('published')
+  @Roles(Role.Admin)
+  async findAllPublished(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    limit = limit > 100 ? 100 : limit; // safety check
+    return this.newsPostService.paginatePublished('published', { page, limit });
+  }
+  // admin (all drafts)
+  @Get('draft')
+  @Roles(Role.Admin)
+  async findAllDrafts(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    limit = limit > 100 ? 100 : limit; // safety check
+    return this.newsPostService.paginatePublished('draft', { page, limit });
+  }
+
+  // admin (all archived)
+  @Get('archived')
+  @Roles(Role.Admin)
+  async findAllArchived(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    limit = limit > 100 ? 100 : limit; // safety check
+    return this.newsPostService.paginatePublished('archived', { page, limit });
+  }
+
   @Get('count/total')
   @Roles(Role.Admin)
-  countPost(){
-    return this.newsPostService.countPost()
+  countPost() {
+    return this.newsPostService.countPost();
   }
 
   @Get('topview/:daysAgo')
-  getTopViewFromDaysAgo(@Param('daysAgo') daysAgo: number ){
+  getTopViewFromDaysAgo(@Param('daysAgo') daysAgo: number) {
     return this.newsPostService.getTopViewFromDaysAgo(daysAgo);
   }
 
@@ -57,28 +89,31 @@ export class NewsPostController {
   }
 
   @Get(':authorId/count/total')
-  countAuthorPost(@Param('authorId') authorId: string){
+  countAuthorPost(@Param('authorId') authorId: string) {
     return this.newsPostService.countAuthorPost(authorId);
   }
 
   @Get(':authorId/posts/all')
-  authorPosts(@Param('authorId') authorId: string){
+  authorPosts(@Param('authorId') authorId: string) {
     return this.newsPostService.authorPosts(authorId);
   }
 
   @Get(':id/views')
-  getViesw(@Param('id') id: string){
+  getViesw(@Param('id') id: string) {
     return this.newsPostService.views(id);
   }
 
   @Post(':id/view/increment')
   @Roles(Role.Admin, Role.Author, Role.User)
-  viewIncrement(@Param('id') id: string){
+  viewIncrement(@Param('id') id: string) {
     return this.newsPostService.viewIncrement(id);
   }
 
   @Patch(':id/update')
-  update(@Param('id') id: string, @Body() updateNewsPostDto: UpdateNewsPostDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateNewsPostDto: UpdateNewsPostDto,
+  ) {
     return this.newsPostService.update(id, updateNewsPostDto);
   }
 
