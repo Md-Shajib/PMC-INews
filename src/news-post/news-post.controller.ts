@@ -72,6 +72,17 @@ export class NewsPostController {
     return this.newsPostService.paginatePublished('archived', { page, limit });
   }
 
+   // admin (all archived)
+  @Get('banned')
+  @Roles(Role.Admin)
+  async findAllBanned(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    limit = limit > 100 ? 100 : limit; // safety check
+    return this.newsPostService.paginatePublished('banned', { page, limit });
+  }
+
   @Get('count/total')
   @Roles(Role.Admin)
   countPost() {

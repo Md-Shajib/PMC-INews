@@ -1,4 +1,14 @@
-import { BadRequestException, Body, Get, Injectable, NotFoundException, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Get,
+  Injectable,
+  NotFoundException,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -18,19 +28,20 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
       const newUser = this.usersRepository.create({
-        ...createUserDto, role: Role.User,
+        ...createUserDto,
+        role: Role.User,
       });
       const savedUser = await this.usersRepository.save(newUser);
       const { password, ...result } = savedUser;
       return result as User;
-
     } catch (error) {
-      if (error.code === '23505') { // PostgreSQL unique violation code
+      if (error.code === '23505') {
+        // PostgreSQL unique violation code
         throw new Error('User with this email already exists');
       }
       throw new Error(`Failed to create user: ${error.message}`);
@@ -52,34 +63,42 @@ export class UsersService {
   async findOne(identifier: string) {
     const isEmail = identifier?.includes('@');
     const isValidUuid = isUuid(identifier);
-    
+
     if (!isEmail && !isValidUuid) {
       throw new BadRequestException('Invalid identifier');
     }
     const foundUser = await this.usersRepository.findOne({
-      where: isEmail ? { email: identifier } : { id: identifier }
+      where: isEmail ? { email: identifier } : { id: identifier },
     });
-    if(!foundUser) throw new NotFoundException("User Not Found");
+    if (!foundUser) throw new NotFoundException('User Not Found');
 
-    return foundUser
+    return foundUser;
   }
 
-  async userCount(){
+  async userCount() {
     return await this.usersRepository.count();
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto, currentUser: User) {
     const user = await this.findOne(id);
     if (!user) {
-      throw new NotFoundException();
+      throw new NotFoundException('User not found');
+    }
+
+    if (updateUserDto?.role && currentUser.role !== 'admin') {
+      delete updateUserDto.role;
+    }
+
+    if (updateUserDto.password) {
+      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 7);
+    } else {
+      delete updateUserDto.password;
     }
 
     Object.assign(user, updateUserDto);
 
     return await this.usersRepository.save(user);
   }
-
-
 
   async remove(id: string) {
     const user = await this.findOne(id);

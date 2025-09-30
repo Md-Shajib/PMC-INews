@@ -26,5 +26,6 @@ export class CreateNewsPostDto {
 export enum NewsStatus {
     DRAFT = 'draft',
     PUBLISHED = 'published',
-    ARCHIVED = 'archived'
+    ARCHIVED = 'archived',
+    BANNED = 'banned',
 }

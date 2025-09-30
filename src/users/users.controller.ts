@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -12,6 +22,8 @@ import { Public, Roles } from 'src/auth/decorators/roles.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Role } from 'src/auth/enum/role.enume';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { User } from './entities/user.entity';
 
 @UseGuards(AuthGuard)
 @UseGuards(RolesGuard)
@@ -19,7 +31,7 @@ import { Role } from 'src/auth/enum/role.enume';
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ) {}
 
   @Public()
@@ -32,7 +44,7 @@ export class UsersController {
   logout(@Res({ passthrough: true }) response: Response) {
     return this.usersService.logout(response);
   }
-  
+
   @Get('all')
   @Roles(Role.Admin)
   findAll() {
@@ -43,22 +55,26 @@ export class UsersController {
   @Roles(Role.Admin, Role.Author, Role.User)
   async findOne(@Param('id') id: string) {
     const getUser = await this.usersService.findOne(id);
-    const { password, ...userWithoutPass} = getUser;
+    const { password, ...userWithoutPass } = getUser;
     return userWithoutPass;
   }
 
   @Get('count/total')
   @Roles(Role.Admin)
-  async userCount(){
+  async userCount() {
     const totalUser = await this.usersService.userCount();
     return totalUser;
   }
 
-  @Patch(':id/update')
-  @Roles(Role.Admin, Role.Author, Role.User)
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
-  }
+@Patch(':id/update')
+@Roles(Role.Admin, Role.Author, Role.User)
+update(
+  @Param('id') id: string, 
+  @Body() updateUserDto: UpdateUserDto,
+  @CurrentUser() currentUser: User,   // 👈 get the logged-in user
+) {
+  return this.usersService.update(id, updateUserDto, currentUser);
+}
 
   @Delete(':id/delete')
   @Roles(Role.Admin, Role.Author, Role.User)
