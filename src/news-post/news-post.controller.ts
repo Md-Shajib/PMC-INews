@@ -12,7 +12,7 @@ import {
 import { NewsPostService } from './news-post.service';
 import { CreateNewsPostDto } from './dto/create-news-post.dto';
 import { UpdateNewsPostDto } from './dto/update-news-post.dto';
-import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Public, Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/enum/role.enume';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -31,6 +31,7 @@ export class NewsPostController {
     return this.newsPostService.create(createNewsPostDto);
   }
 
+  @Public()
   @Get('all')
   async findAll(
     @Query('page') page: number = 1,
@@ -94,6 +95,7 @@ export class NewsPostController {
     return this.newsPostService.getTopViewFromDaysAgo(daysAgo);
   }
 
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.newsPostService.findOne(id);
