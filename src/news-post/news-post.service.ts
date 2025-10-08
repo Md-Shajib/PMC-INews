@@ -51,7 +51,7 @@ export class NewsPostService {
 
   async views(id: string) {
     const postViews = await this.newsPostRepository.findOne({
-      select: ['view_count'],
+      select: ['views'],
       where: { id },
     });
     if (!postViews) {
@@ -65,14 +65,14 @@ export class NewsPostService {
     if (!post) {
       throw new NotFoundException('Post not found');
     }
-    post.view_count += 1;
+    post.views += 1;
     await this.newsPostRepository.save(post);
-    return post.view_count;
+    return post.views;
   }
 
-  async countAuthorPost(authorId: string) {
+  async countAuthorPost(journalistId: string) {
     const totalPosts = await this.newsPostRepository.count({
-      where: { author_id: authorId },
+      where: { journalist_id: journalistId },
     });
     if (!totalPosts) {
       throw new NotFoundException('No post yet!');
@@ -92,9 +92,9 @@ export class NewsPostService {
     return paginate<NewsPost>(queryBuilder, options);
   }
 
-  async authorPosts(authorId: string) {
+  async journalistPosts(journalistId: string) {
     const posts = await this.newsPostRepository.find({
-      where: { author_id: authorId },
+      where: { journalist_id: journalistId },
     });
     if (!posts) {
       throw new NotFoundException('No post yet!');
@@ -111,9 +111,9 @@ export class NewsPostService {
     fromDate.setDate(fromDate.getDate() - daysAgo);
     return await this.newsPostRepository.findOne({
       where: {
-        post_date: MoreThanOrEqual(fromDate),
+        created_at: MoreThanOrEqual(fromDate),
       },
-      order: { view_count: 'DESC' },
+      order: { views: 'DESC' },
     });
   }
 

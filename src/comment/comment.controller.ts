@@ -17,26 +17,26 @@ export class CommentController {
 
   @ApiResponse(CREATE_COMMENT)
   @Post('add')
-  @Roles(Role.Admin, Role.Author, Role.User)
+  @Roles(Role.Admin, Role.Journalist, Role.User)
   createComment(@Body() createCommentDto: CreateCommentDto) {
     return this.commentService.createComment(createCommentDto);
   }
 
   @ApiResponse(CREATE_REPLAY)
   @Post('replay/add')
-  @Roles(Role.Admin, Role.Author, Role.User)
+  @Roles(Role.Admin, Role.Journalist, Role.User)
   createReplay(@Body() createReplayDto:  CreateReplayDto){
     return this.commentService.createReplay(createReplayDto);
   }
 
   @Get(':post_id/comments')
-  @Roles(Role.Admin, Role.Author, Role.User)
+  @Roles(Role.Admin, Role.Journalist, Role.User)
   findAll(@Param('post_id') post_id: string) {
     return this.commentService.findAll(post_id);
   }
 
   @Get(':comment_id/replies')
-  @Roles(Role.Admin, Role.Author, Role.User)
+  @Roles(Role.Admin, Role.Journalist, Role.User)
   findAllReplay(
     @Param('comment_id') comment_id: string
   ){
@@ -44,20 +44,20 @@ export class CommentController {
   }
 
   @Get(':comment_id')
-  @Roles(Role.Admin, Role.Author, Role.User)
+  @Roles(Role.Admin, Role.Journalist, Role.User)
   findOne(@Param('comment_id') comment_id: string) {
     return this.commentService.findOne(comment_id);
   }
 
   @ApiResponse(UPDATE_COMMENT)
   @Patch(':comment_id/edit')
-  @Roles(Role.Admin, Role.Author, Role.User)
+  @Roles(Role.Admin, Role.Journalist, Role.User)
   update(@Param('comment_id') comment_id: string, @Body() updateCommentDto: UpdateCommentDto) {
     return this.commentService.update(comment_id, updateCommentDto);
   }
 
   @Delete(':comment_id/delete')
-  @Roles(Role.Admin, Role.Author, Role.User)
+  @Roles(Role.Admin, Role.Journalist, Role.User)
   remove(@Param('comment_id') comment_id: string) {
     return this.commentService.remove(comment_id);
   }

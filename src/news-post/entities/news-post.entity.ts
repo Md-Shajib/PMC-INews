@@ -1,31 +1,39 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { NewsStatus } from "../dto/create-news-post.dto";
 
+import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { NewsStatus, NewsType } from "../dto/create-news-post.dto";
 
-@Entity({name: 'news_post'})
+@Entity({ name: 'news_post' })
 export class NewsPost {
-    @PrimaryGeneratedColumn('uuid')
-    id: string
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column('uuid')
-    category_id: string
+  @Column('uuid')
+  category_id: string;
 
-    @Column()
-    post_date: Date
+  @Column('uuid')
+  journalist_id: string;
 
-    @Column()
-    news_title: string
+  @Column({ type: 'enum', enum: NewsType})
+  news_type: string;
 
-    @Column()
-    news_content: string
+  @Column()
+  news_title: string;
 
-    @Column({type: 'enum', enum: NewsStatus, default: NewsStatus.DRAFT})
-    news_status: string
+  @Column({ type: 'text' })
+  news_body: string;
 
-    @Column({ type: 'int', default: 0 })
-    view_count: number
+  @Column({ nullable: true })
+  media_link: string;
 
-    @Column('uuid')
-    author_id: string
+  @Column({ type: 'int', default: 0 })
+  views: number;
+
+  @Column({ type: 'enum', enum: NewsStatus, default: NewsStatus.DRAFT })
+  status: NewsStatus;
+
+  @CreateDateColumn({ type: 'timestamp with time zone' })
+  created_at: Date;
+
+  @UpdateDateColumn({ type: 'timestamp with time zone' })
+  updated_at: Date;
 }
-

@@ -14,19 +14,19 @@ export class ReactController {
   constructor(private readonly reactService: ReactService) {}
 
   @Post('add')
-  @Roles( Role.Admin, Role.Author, Role.User )
+  @Roles( Role.Admin, Role.Journalist, Role.User )
   create(@Body() createReactDto: CreateReactDto) {
     return this.reactService.create(createReactDto);
   }
 
   @Get(':post_id/react')
-  @Roles( Role.Admin, Role.Author, Role.User )
+  @Roles( Role.Admin, Role.Journalist, Role.User )
   findAll(@Param('post_id') post_id: string) {
     return this.reactService.findAll(post_id);
   }
 
   @Get(':post_id/:user_id/react')
-  @Roles( Role.Admin, Role.Author, Role.User )
+  @Roles( Role.Admin, Role.Journalist, Role.User )
   findOne(
     @Param('post_id') post_id: string,
     @Param('user_id') user_id: string,
@@ -35,7 +35,7 @@ export class ReactController {
   }
 
   @Patch(':post_id/:user_id/update')
-  @Roles( Role.Admin, Role.Author, Role.User )
+  @Roles( Role.Admin, Role.Journalist, Role.User )
   update(
     @Param('post_id') post_id: string,
     @Param('user_id') user_id: string,
@@ -45,7 +45,7 @@ export class ReactController {
   }
 
   @Delete(':post_id/:user_id/delete')
-  @Roles( Role.Admin, Role.Author, Role.User )
+  @Roles( Role.Admin, Role.Journalist, Role.User )
   remove(
     @Param('post_id') post_id: string,
     @Param('user_id') user_id: string,

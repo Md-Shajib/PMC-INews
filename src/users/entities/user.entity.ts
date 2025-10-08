@@ -42,6 +42,9 @@ export class User {
   @Column({ default: 'user' })
   role: Role;
 
+  @Column({ nullable: true })
+  image_url?: string;
+
   @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 

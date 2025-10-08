@@ -21,7 +21,7 @@ import { NewsPost } from './entities/news-post.entity';
 
 @UseGuards(AuthGuard)
 @UseGuards(RolesGuard)
-@Roles(Role.Admin, Role.Author)
+@Roles(Role.Admin, Role.Journalist)
 @Controller('news-post')
 export class NewsPostController {
   constructor(private readonly newsPostService: NewsPostService) {}
@@ -108,7 +108,7 @@ export class NewsPostController {
 
   @Get(':authorId/posts/all')
   authorPosts(@Param('authorId') authorId: string) {
-    return this.newsPostService.authorPosts(authorId);
+    return this.newsPostService.journalistPosts(authorId);
   }
 
   @Get(':id/views')
@@ -117,7 +117,7 @@ export class NewsPostController {
   }
 
   @Post(':id/view/increment')
-  @Roles(Role.Admin, Role.Author, Role.User)
+  @Roles(Role.Admin, Role.Journalist, Role.User)
   viewIncrement(@Param('id') id: string) {
     return this.newsPostService.viewIncrement(id);
   }

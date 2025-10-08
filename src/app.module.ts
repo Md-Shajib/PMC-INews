@@ -9,8 +9,8 @@ import { NewsPostModule } from './news-post/news-post.module';
 import { CommentModule } from './comment/comment.module';
 import { ReactModule } from './react/react.module';
 import { CategoryModule } from './category/category.module';
-import { AuthorModule } from './author/author.module';
 import { AuthModule } from './auth/auth.module';
+import { JournalistModule } from './journalist/journalist.module';
 
 
 @Module({
@@ -37,8 +37,8 @@ import { AuthModule } from './auth/auth.module';
     CommentModule,
     ReactModule,
     CategoryModule,
-    AuthorModule,
-    AuthModule
+    AuthModule,
+    JournalistModule
   ],
   controllers: [AppController],
   providers: [AppService],

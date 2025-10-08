@@ -52,7 +52,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  @Roles(Role.Admin, Role.Author, Role.User)
+  @Roles(Role.Admin, Role.Journalist, Role.User)
   async findOne(@Param('id') id: string) {
     const getUser = await this.usersService.findOne(id);
     const { password, ...userWithoutPass } = getUser;
@@ -67,7 +67,7 @@ export class UsersController {
   }
 
 @Patch(':id/update')
-@Roles(Role.Admin, Role.Author, Role.User)
+@Roles(Role.Admin, Role.Journalist, Role.User)
 update(
   @Param('id') id: string, 
   @Body() updateUserDto: UpdateUserDto,
@@ -77,7 +77,7 @@ update(
 }
 
   @Delete(':id/delete')
-  @Roles(Role.Admin, Role.Author, Role.User)
+  @Roles(Role.Admin, Role.Journalist, Role.User)
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
   }

@@ -1,4 +1,4 @@
-import { IsEmail, IsIn, IsNotEmpty, IsString, IsUUID, Matches, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, IsUrl, IsUUID, Matches, MaxLength, MinLength } from 'class-validator';
 
 export class CreateUserDto {
 
@@ -11,6 +11,10 @@ export class CreateUserDto {
     @IsEmail({}, {message: 'Invalid email address'})
     @MaxLength(50, {message: 'Email is too long'})
     email: string;
+
+    @IsUrl()
+    @IsOptional()
+    image_url?: string;
 
     @IsString()
     @MinLength(8, { message: 'Password must be at least 8 characters long' })

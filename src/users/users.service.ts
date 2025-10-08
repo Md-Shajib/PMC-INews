@@ -60,7 +60,15 @@ export class UsersService {
     return await this.usersRepository.find();
   }
 
-  async findOne(identifier: string) {
+  async findOne(id: string) {
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
+
+  async findOneByIdentifier(identifier: string) {
     const isEmail = identifier?.includes('@');
     const isValidUuid = isUuid(identifier);
 
@@ -69,6 +77,22 @@ export class UsersService {
     }
     const foundUser = await this.usersRepository.findOne({
       where: isEmail ? { email: identifier } : { id: identifier },
+    });
+    if (!foundUser) throw new NotFoundException('User Not Found');
+    
+    const { password, ...result } = foundUser;
+
+    return result;
+  }
+
+   async findOneByEmail(email: string) {
+    const isEmail = email?.includes('@');
+    if (!isEmail) {
+      throw new BadRequestException('Invalid Email');
+    }  
+    
+    const foundUser = await this.usersRepository.findOne({
+      where: { email }
     });
     if (!foundUser) throw new NotFoundException('User Not Found');
 
