@@ -86,9 +86,9 @@ export class NewsPostService {
   ): Promise<Pagination<NewsPost>> {
     const queryBuilder = this.newsPostRepository.createQueryBuilder('news');
     // Use alias `news` here
-    queryBuilder.where('news.news_status = :status', { status });
+    queryBuilder.where('news.status = :status', { status });
     // Order by post_date or created column
-    queryBuilder.orderBy('news.post_date', 'DESC');
+    queryBuilder.orderBy('news.created_at', 'DESC');
     return paginate<NewsPost>(queryBuilder, options);
   }
 

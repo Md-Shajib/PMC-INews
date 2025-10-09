@@ -1,6 +1,7 @@
 
-import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
 import { NewsStatus, NewsType } from "../dto/create-news-post.dto";
+import { Category } from "src/category/entities/category.entity";
 
 @Entity({ name: 'news_post' })
 export class NewsPost {
@@ -9,6 +10,10 @@ export class NewsPost {
 
   @Column('uuid')
   category_id: string;
+
+  @ManyToOne(() => Category)
+  @JoinColumn({ name: 'category_id' })
+  category: Category;
 
   @Column('uuid')
   journalist_id: string;

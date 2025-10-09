@@ -5,7 +5,7 @@ export class CreateUserDto {
     @IsString()
     @MinLength(5)
     @MaxLength(50)
-    @Matches(/^[a-zA-Z\s'_-]+$/, { message: 'Name can only contain letters, spaces, hyphens, and apostrophes' })
+    @Matches(/^[a-zA-Z0-9\s'_-]+$/, { message: 'Name can only contain letters, spaces, hyphens, and apostrophes' })
     name: string;
 
     @IsEmail({}, {message: 'Invalid email address'})

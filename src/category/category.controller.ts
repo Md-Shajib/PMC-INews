@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, ParseIntPipe } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -20,9 +20,15 @@ export class CategoryController {
   }
 
   @Get()
-  @Roles(Role.Admin, Role.Journalist)
-  findAll() {
-    return this.categoryService.findAll();
+  @Roles(Role.Admin)
+  async findAll(
+    @Query('page', ParseIntPipe) page: number = 1,
+    @Query('limit', ParseIntPipe) limit: number = 10,
+    @Query('search') search?: string,
+    @Query('status') status?: string,
+  ): Promise<any> {
+    limit = limit > 100 ? 100 : limit;
+    return this.categoryService.findAll({ page, limit, search, status });
   }
 
   @Get('total')

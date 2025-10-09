@@ -22,7 +22,7 @@ import { NewsPost } from './entities/news-post.entity';
 @UseGuards(AuthGuard)
 @UseGuards(RolesGuard)
 @Roles(Role.Admin, Role.Journalist)
-@Controller('news-post')
+@Controller('news')
 export class NewsPostController {
   constructor(private readonly newsPostService: NewsPostService) {}
 
@@ -32,7 +32,7 @@ export class NewsPostController {
   }
 
   @Public()
-  @Get('all')
+  @Get()
   async findAll(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
@@ -51,6 +51,7 @@ export class NewsPostController {
     limit = limit > 100 ? 100 : limit; // safety check
     return this.newsPostService.paginatePublished('published', { page, limit });
   }
+
   // admin (all drafts)
   @Get('draft')
   @Roles(Role.Admin)
@@ -63,15 +64,15 @@ export class NewsPostController {
   }
 
   // admin (all archived)
-  @Get('archived')
-  @Roles(Role.Admin)
-  async findAllArchived(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-  ) {
-    limit = limit > 100 ? 100 : limit; // safety check
-    return this.newsPostService.paginatePublished('archived', { page, limit });
-  }
+  // @Get('archived')
+  // @Roles(Role.Admin)
+  // async findAllArchived(
+  //   @Query('page') page: number = 1,
+  //   @Query('limit') limit: number = 10,
+  // ) {
+  //   limit = limit > 100 ? 100 : limit; // safety check
+  //   return this.newsPostService.paginatePublished('archived', { page, limit });
+  // }
 
    // admin (all archived)
   @Get('banned')
@@ -84,7 +85,7 @@ export class NewsPostController {
     return this.newsPostService.paginatePublished('banned', { page, limit });
   }
 
-  @Get('count/total')
+  @Get('total')
   @Roles(Role.Admin)
   countPost() {
     return this.newsPostService.countPost();

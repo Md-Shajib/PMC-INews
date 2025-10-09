@@ -4,7 +4,7 @@ import { IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validato
 export enum NewsStatus {
     DRAFT = 'draft',
     PUBLISHED = 'published',
-    UNPUBLISHED = 'unpublished',
+    // UNPUBLISHED = 'unpublished',
     BANNED = 'banned',
 }
 

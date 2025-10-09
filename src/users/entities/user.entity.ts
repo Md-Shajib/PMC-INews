@@ -25,9 +25,6 @@ export class User {
   @Column({ type: 'varchar', length: 60 })
   @IsString()
   @MaxLength(50)
-  @Matches(/^[a-zA-Z\s'_-]+$/, {
-    message: 'Name can only contain letters, spaces, hyphens, and apostrophes',
-  })
   name: string;
 
   @Column({ type: 'varchar', length: 50, unique: true })

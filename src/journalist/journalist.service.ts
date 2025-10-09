@@ -44,6 +44,11 @@ export class JournalistService {
 
       if (isUser) {
         isUser.role = Role.Journalist;
+        isUser.name = createJournalistDto.name;
+        isUser.image_url = createJournalistDto.image_url || isUser.image_url;
+        if (createJournalistDto.password) {
+          isUser.password = await bcrypt.hash(createJournalistDto.password, 7);
+        }
         await this.userRepository.save(isUser);
 
         const newJournalist = this.journalistRepository.create(
@@ -114,7 +119,7 @@ export class JournalistService {
     const updatedUser: any = {};
     if (updateJournalistDto.name) updatedUser.name = updateJournalistDto.name;
     if (updateJournalistDto.email) updatedUser.email = updateJournalistDto.email;
-    if (updateJournalistDto.password) updatedUser.password = await bcrypt.hash(updateJournalistDto.password, 7); // ⚠️ Hash if needed
+    if (updateJournalistDto.password) updatedUser.password = await bcrypt.hash(updateJournalistDto.password, 7);
     if (updateJournalistDto.image_url) updatedUser.image_url = updateJournalistDto.image_url;
     await this.userRepository.update(user?.id, updatedUser);
     
