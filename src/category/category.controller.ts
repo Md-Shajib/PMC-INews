@@ -13,37 +13,37 @@ import { Role } from 'src/auth/enum/role.enume';
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  @Post('add')
+  @Post()
   @Roles(Role.Admin, Role.Journalist)
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);
   }
 
-  @Get('all')
+  @Get()
   @Roles(Role.Admin, Role.Journalist)
   findAll() {
     return this.categoryService.findAll();
   }
 
-  @Get('count/total')
-  @Roles(Role.Admin)
+  @Get('total')
+  @Roles(Role.Admin, Role.Journalist)
   countCategory() {
     return this.categoryService.countCategory();
   }
 
-  @Get(':id/category')
+  @Get(':id')
   @Roles(Role.Admin, Role.Journalist)
   findOne(@Param('id') id: string) {
     return this.categoryService.findOne(id);
   }
 
-  @Patch(':id/update')
+  @Patch(':id')
   @Roles(Role.Admin, Role.Journalist)
   update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
     return this.categoryService.update(id, updateCategoryDto);
   }
 
-  @Delete(':id/delete')
+  @Delete(':id')
   @Roles(Role.Admin, Role.Journalist)
   remove(@Param('id') id: string) {
     return this.categoryService.remove(id);
