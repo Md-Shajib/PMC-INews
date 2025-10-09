@@ -116,6 +116,7 @@ export class CategoryService {
       throw new NotFoundException();
     }
     Object.assign(category, updateCategoryDto);
+    category.updated_at = new Date();
     return await this.categoryRepository.save(category);
   }
 

@@ -11,6 +11,7 @@ import { ReactModule } from './react/react.module';
 import { CategoryModule } from './category/category.module';
 import { AuthModule } from './auth/auth.module';
 import { JournalistModule } from './journalist/journalist.module';
+import { FaqModule } from './faq/faq.module';
 
 
 @Module({
@@ -38,7 +39,8 @@ import { JournalistModule } from './journalist/journalist.module';
     ReactModule,
     CategoryModule,
     AuthModule,
-    JournalistModule
+    JournalistModule,
+    FaqModule
   ],
   controllers: [AppController],
   providers: [AppService],
