@@ -14,6 +14,7 @@ import { JournalistModule } from './journalist/journalist.module';
 import { FaqModule } from './faq/faq.module';
 import { SubscriberModule } from './subscriber/subscriber.module';
 import { ContactModule } from './contact/contact.module';
+import { TeamMemberModule } from './team-member/team-member.module';
 
 
 @Module({
@@ -44,7 +45,8 @@ import { ContactModule } from './contact/contact.module';
     JournalistModule,
     FaqModule,
     SubscriberModule,
-    ContactModule
+    ContactModule,
+    TeamMemberModule
   ],
   controllers: [AppController],
   providers: [AppService],
