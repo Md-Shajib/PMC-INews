@@ -13,6 +13,7 @@ import { AuthModule } from './auth/auth.module';
 import { JournalistModule } from './journalist/journalist.module';
 import { FaqModule } from './faq/faq.module';
 import { SubscriberModule } from './subscriber/subscriber.module';
+import { ContactModule } from './contact/contact.module';
 
 
 @Module({
@@ -42,7 +43,8 @@ import { SubscriberModule } from './subscriber/subscriber.module';
     AuthModule,
     JournalistModule,
     FaqModule,
-    SubscriberModule
+    SubscriberModule,
+    ContactModule
   ],
   controllers: [AppController],
   providers: [AppService],
