@@ -12,6 +12,7 @@ import { CategoryModule } from './category/category.module';
 import { AuthModule } from './auth/auth.module';
 import { JournalistModule } from './journalist/journalist.module';
 import { FaqModule } from './faq/faq.module';
+import { SubscriberModule } from './subscriber/subscriber.module';
 
 
 @Module({
@@ -40,7 +41,8 @@ import { FaqModule } from './faq/faq.module';
     CategoryModule,
     AuthModule,
     JournalistModule,
-    FaqModule
+    FaqModule,
+    SubscriberModule
   ],
   controllers: [AppController],
   providers: [AppService],
