@@ -15,6 +15,7 @@ import { FaqModule } from './faq/faq.module';
 import { SubscriberModule } from './subscriber/subscriber.module';
 import { ContactModule } from './contact/contact.module';
 import { TeamMemberModule } from './team-member/team-member.module';
+import { ContentModule } from './content/content.module';
 
 
 @Module({
@@ -46,7 +47,8 @@ import { TeamMemberModule } from './team-member/team-member.module';
     FaqModule,
     SubscriberModule,
     ContactModule,
-    TeamMemberModule
+    TeamMemberModule,
+    ContentModule
   ],
   controllers: [AppController],
   providers: [AppService],
