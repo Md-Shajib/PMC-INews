@@ -3,19 +3,14 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcryptjs';
+import { Role } from 'src/auth/enum/role.enume';
+import { User } from 'src/users/entities/user.entity';
+import { Repository } from 'typeorm';
 import { CreateJournalistDto } from './dto/create-journalist.dto';
 import { UpdateJournalistDto } from './dto/update-journalist.dto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Journalist } from './entities/journalist.entity';
-import { Repository } from 'typeorm';
-import { User } from 'src/users/entities/user.entity';
-import {
-  IPaginationOptions,
-  Pagination,
-  paginate,
-} from 'nestjs-typeorm-paginate';
-import { Role } from 'src/auth/enum/role.enume';
-import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class JournalistService {
@@ -82,84 +77,52 @@ export class JournalistService {
     }
   }
 
-async paginateFindAll(
-  page = 1,
-  limit = 10,
-  search?: string,
-): Promise<{
-  data: (Journalist & { total_news: number })[];
-  meta: { total: number; page: number; limit: number; totalPages: number };
-}> {
-  const skip = (page - 1) * limit;
+  async paginateFindAll(
+    page = 1,
+    limit = 10,
+    search?: string,
+  ): Promise<{
+    data: (Journalist & { total_news: number })[];
+    meta: { total: number; page: number; limit: number; totalPages: number };
+  }> {
+    const skip = (page - 1) * limit;
 
-  const query = this.journalistRepository
-    .createQueryBuilder('journalist')
-    .leftJoin('journalist.news_posts', 'news_post')
-    .addSelect('COUNT(news_post.id)', 'total_news')
-    .groupBy('journalist.id')
-    .orderBy('journalist.created_at', 'DESC')
-    .skip(skip)
-    .take(limit);
+    const query = this.journalistRepository
+      .createQueryBuilder('journalist')
+      .leftJoin('journalist.news_posts', 'news_post')
+      .addSelect('COUNT(news_post.id)', 'total_news')
+      .groupBy('journalist.id')
+      .orderBy('journalist.created_at', 'DESC')
+      .skip(skip)
+      .take(limit);
 
-  if (search) {
-    query.andWhere(
-      '(journalist.name ILIKE :search OR journalist.email ILIKE :search)',
-      { search: `%${search}%` },
-    );
+    if (search) {
+      query.andWhere(
+        '(journalist.name ILIKE :search OR journalist.email ILIKE :search)',
+        { search: `%${search}%` },
+      );
+    }
+
+    // Execute query and get entities + raw counts
+    const [data, total] = await query.getManyAndCount();
+
+    // Map total_news manually using getRawMany
+    const raw = await query.getRawMany();
+    const items = data.map((journalist, index) => ({
+      ...journalist,
+      total_news: Number(raw[index]?.total_news ?? 0),
+    }));
+
+    return {
+      data: items,
+      meta: {
+        total,
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
-
-  // Execute query and get entities + raw counts
-  const [data, total] = await query.getManyAndCount();
-
-  // Map total_news manually using getRawMany
-  const raw = await query.getRawMany();
-  const items = data.map((journalist, index) => ({
-    ...journalist,
-    total_news: Number(raw[index]?.total_news ?? 0),
-  }));
-
-  return {
-    data: items,
-    meta: {
-      total,
-      page: Number(page),
-      limit: Number(limit),
-      totalPages: Math.ceil(total / limit),
-    },
-  };
-}
-
-
-  // async findAll(page = 1, limit = 10, search?: string) {
-  //   const skip = (page - 1) * limit;
-  //   const query = this.journalistRepository
-  //     .createQueryBuilder('journalist')
-  //     .leftJoin('journalist.news_posts', 'news_post')
-  //     .addSelect('COUNT(news_post.id)', 'total_news')
-  //     .groupBy('journalist.id')
-  //     .orderBy('journalist.created_at', 'DESC')
-  //     .skip(skip)
-  //     .take(limit);
-
-  //   if (search) {
-  //     query.andWhere(
-  //       '(journalist.name ILIKE :search OR journalist.email ILIKE :search)',
-  //       { search: `%${search}%` },
-  //     );
-  //   }
-
-  //   const [data, total] = await query.getManyAndCount();
-
-  //   return {
-  //     data,
-  //     meta: {
-  //       total,
-  //       page,
-  //       limit,
-  //       totalPages: Math.ceil(total / limit),
-  //     },
-  //   };
-  // }
 
   async findOne(id: string) {
     const journalist = await this.journalistRepository.findOne({
