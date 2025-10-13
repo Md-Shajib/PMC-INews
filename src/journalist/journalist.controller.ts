@@ -25,11 +25,12 @@ export class JournalistController {
   @Get()
   @Roles(Role.Admin)
   async findAll(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+    @Query('search') search?: string,
   ) {
     limit = limit > 100 ? 100 : limit;
-    return this.journalistService.paginate({ page, limit });
+    return this.journalistService.paginateFindAll(page, limit, search);
   }
 
   // get total journalist api

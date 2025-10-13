@@ -2,6 +2,7 @@
 import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
 import { NewsStatus, NewsType } from "../dto/create-news-post.dto";
 import { Category } from "src/category/entities/category.entity";
+import { Journalist } from "src/journalist/entities/journalist.entity";
 
 @Entity({ name: 'news_post' })
 export class NewsPost {
@@ -18,7 +19,11 @@ export class NewsPost {
   @Column('uuid')
   journalist_id: string;
 
-  @Column({ type: 'enum', enum: NewsType})
+  @ManyToOne(() => Journalist, (journalist) => journalist.news_posts)
+  @JoinColumn({ name: 'journalist_id' })
+  journalist: Journalist;
+
+  @Column({ type: 'enum', enum: NewsType })
   news_type: string;
 
   @Column()

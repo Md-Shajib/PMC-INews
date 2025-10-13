@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateJournalistDto } from './dto/create-journalist.dto';
 import { UpdateJournalistDto } from './dto/update-journalist.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -21,10 +25,6 @@ export class JournalistService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
-
-  async paginate(options: IPaginationOptions): Promise<Pagination<Journalist>> {
-    return paginate<Journalist>(this.journalistRepository, options);
-  }
 
   async create(createJournalistDto: CreateJournalistDto): Promise<Journalist> {
     try {
@@ -51,15 +51,12 @@ export class JournalistService {
         }
         await this.userRepository.save(isUser);
 
-        const newJournalist = this.journalistRepository.create(
-          createJournalistDto,
-        );
+        const newJournalist =
+          this.journalistRepository.create(createJournalistDto);
 
-        const saveJournalist = await this.journalistRepository.save(
-          newJournalist,
-        );
+        const saveJournalist =
+          await this.journalistRepository.save(newJournalist);
         return saveJournalist as Journalist;
-
       } else {
         const newUser = this.userRepository.create({
           name: createJournalistDto.name,
@@ -70,12 +67,10 @@ export class JournalistService {
         });
         await this.userRepository.save(newUser);
 
-        const newJournalist = this.journalistRepository.create(
-          createJournalistDto,
-        );
-        const saveJournalist = await this.journalistRepository.save(
-          newJournalist,
-        );
+        const newJournalist =
+          this.journalistRepository.create(createJournalistDto);
+        const saveJournalist =
+          await this.journalistRepository.save(newJournalist);
         return saveJournalist as Journalist;
       }
     } catch (error) {
@@ -87,9 +82,84 @@ export class JournalistService {
     }
   }
 
-  async findAll() {
-    return await this.journalistRepository.find();
+async paginateFindAll(
+  page = 1,
+  limit = 10,
+  search?: string,
+): Promise<{
+  data: (Journalist & { total_news: number })[];
+  meta: { total: number; page: number; limit: number; totalPages: number };
+}> {
+  const skip = (page - 1) * limit;
+
+  const query = this.journalistRepository
+    .createQueryBuilder('journalist')
+    .leftJoin('journalist.news_posts', 'news_post')
+    .addSelect('COUNT(news_post.id)', 'total_news')
+    .groupBy('journalist.id')
+    .orderBy('journalist.created_at', 'DESC')
+    .skip(skip)
+    .take(limit);
+
+  if (search) {
+    query.andWhere(
+      '(journalist.name ILIKE :search OR journalist.email ILIKE :search)',
+      { search: `%${search}%` },
+    );
   }
+
+  // Execute query and get entities + raw counts
+  const [data, total] = await query.getManyAndCount();
+
+  // Map total_news manually using getRawMany
+  const raw = await query.getRawMany();
+  const items = data.map((journalist, index) => ({
+    ...journalist,
+    total_news: Number(raw[index]?.total_news ?? 0),
+  }));
+
+  return {
+    data: items,
+    meta: {
+      total,
+      page: Number(page),
+      limit: Number(limit),
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+}
+
+
+  // async findAll(page = 1, limit = 10, search?: string) {
+  //   const skip = (page - 1) * limit;
+  //   const query = this.journalistRepository
+  //     .createQueryBuilder('journalist')
+  //     .leftJoin('journalist.news_posts', 'news_post')
+  //     .addSelect('COUNT(news_post.id)', 'total_news')
+  //     .groupBy('journalist.id')
+  //     .orderBy('journalist.created_at', 'DESC')
+  //     .skip(skip)
+  //     .take(limit);
+
+  //   if (search) {
+  //     query.andWhere(
+  //       '(journalist.name ILIKE :search OR journalist.email ILIKE :search)',
+  //       { search: `%${search}%` },
+  //     );
+  //   }
+
+  //   const [data, total] = await query.getManyAndCount();
+
+  //   return {
+  //     data,
+  //     meta: {
+  //       total,
+  //       page,
+  //       limit,
+  //       totalPages: Math.ceil(total / limit),
+  //     },
+  //   };
+  // }
 
   async findOne(id: string) {
     const journalist = await this.journalistRepository.findOne({
@@ -107,34 +177,41 @@ export class JournalistService {
 
   async update(id: string, updateJournalistDto: UpdateJournalistDto) {
     const journalist = await this.findOne(id);
-    const user = await this.userRepository.findOne({ where: { email: journalist.email } });
+    const user = await this.userRepository.findOne({
+      where: { email: journalist.email },
+    });
 
     if (!journalist || !user) {
       throw new NotFoundException();
     }
-    
+
     const { password, ...journalistData } = updateJournalistDto;
     await this.journalistRepository.update(id, journalistData);
 
     const updatedUser: any = {};
     if (updateJournalistDto.name) updatedUser.name = updateJournalistDto.name;
-    if (updateJournalistDto.email) updatedUser.email = updateJournalistDto.email;
-    if (updateJournalistDto.password) updatedUser.password = await bcrypt.hash(updateJournalistDto.password, 7);
-    if (updateJournalistDto.image_url) updatedUser.image_url = updateJournalistDto.image_url;
+    if (updateJournalistDto.email)
+      updatedUser.email = updateJournalistDto.email;
+    if (updateJournalistDto.password)
+      updatedUser.password = await bcrypt.hash(updateJournalistDto.password, 7);
+    if (updateJournalistDto.image_url)
+      updatedUser.image_url = updateJournalistDto.image_url;
     await this.userRepository.update(user?.id, updatedUser);
-    
+
     return this.findOne(id);
   }
 
   async remove(id: string) {
     const journalist = await this.findOne(id);
-    const user = await this.userRepository.findOne({ where: { email: journalist.email } });
+    const user = await this.userRepository.findOne({
+      where: { email: journalist.email },
+    });
     if (!journalist && !user) {
       throw new NotFoundException();
     }
     await this.journalistRepository.remove(journalist as Journalist);
     await this.userRepository.remove(user as User);
 
-    return { message: "Delete successfully: ", journalist };
+    return { message: 'Delete successfully: ', journalist };
   }
 }

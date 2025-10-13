@@ -1,9 +1,11 @@
+import { NewsPost } from 'src/news-post/entities/news-post.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 export enum JournalistStatus {
@@ -52,4 +54,7 @@ export class Journalist {
 
   @Column({ nullable: true })
   linkedin?: string;
+
+  @OneToMany(() => NewsPost, (newsPost) => newsPost.journalist)
+  news_posts: NewsPost[];
 }
