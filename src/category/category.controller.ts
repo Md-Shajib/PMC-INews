@@ -22,8 +22,8 @@ export class CategoryController {
   @Get()
   @Roles(Role.Admin)
   async findAll(
-    @Query('page', ParseIntPipe) page: number = 1,
-    @Query('limit', ParseIntPipe) limit: number = 10,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
     @Query('search') search?: string,
     @Query('status') status?: string,
   ): Promise<any> {

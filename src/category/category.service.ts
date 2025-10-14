@@ -89,8 +89,8 @@ export class CategoryService {
       categories: formatted,
       meta: {
         total: total,
-        page: page,
-        limit: limit,
+        page: Number(page),
+        limit: Number(limit),
         totalPages: Math.ceil(total / limit),
       },
     };

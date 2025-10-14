@@ -70,9 +70,13 @@ export class FaqService {
     return paginatedResult;
   }
 
-  // findOne(id: number) {
-  //   return `This action returns a #${id} faq`;
-  // }
+  async findOne(id: string) {
+    const faq = await this.faqRepository.findOne({ where: { id } });
+    if (!faq) {
+      throw new NotFoundException(`FAQ with ID ${id} not found`);
+    }
+    return faq;
+  }
 
   async update(id: string, updateFaqDto: UpdateFaqDto) {
     const faq = await this.faqRepository.findOne({ where: { id } });

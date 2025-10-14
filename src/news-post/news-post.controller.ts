@@ -36,9 +36,13 @@ export class NewsPostController {
   async findAll(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
-  ): Promise<Pagination<NewsPost>> {
+    @Query('search') search?: string,
+    @Query('status') status?: string,
+  ) {
     limit = limit > 100 ? 100 : limit; // optional max limit safeguard
-    return this.newsPostService.paginate({ page, limit });
+    // console.log("News Post Controller", { page, limit, search, status });
+    
+    return this.newsPostService.paginateFindAll( page, limit, search, status );
   }
 
   // admin (all published)

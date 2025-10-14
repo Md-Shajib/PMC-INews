@@ -1,12 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { FaqService } from './faq.service';
 import { CreateFaqDto } from './dto/create-faq.dto';
 import { UpdateFaqDto } from './dto/update-faq.dto';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'src/auth/enum/role.enume';
 
+@UseGuards(AuthGuard)
+@UseGuards(RolesGuard)
+@Roles(Role.Admin)
 @Controller('faq')
 export class FaqController {
   constructor(private readonly faqService: FaqService) {}
 
+  
   @Post()
   create(@Body() createFaqDto: CreateFaqDto) {
     return this.faqService.create(createFaqDto);
@@ -23,10 +31,11 @@ export class FaqController {
     return this.faqService.findAll({ page, limit, search, status });
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.faqService.findOne(+id);
-  // }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.faqService.findOne(id);
+  }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateFaqDto: UpdateFaqDto) {

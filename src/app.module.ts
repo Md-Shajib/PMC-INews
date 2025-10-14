@@ -16,6 +16,7 @@ import { SubscriberModule } from './subscriber/subscriber.module';
 import { ContactModule } from './contact/contact.module';
 import { TeamMemberModule } from './team-member/team-member.module';
 import { ContentModule } from './content/content.module';
+import { ReviewModule } from './review/review.module';
 
 
 @Module({
@@ -48,7 +49,8 @@ import { ContentModule } from './content/content.module';
     SubscriberModule,
     ContactModule,
     TeamMemberModule,
-    ContentModule
+    ContentModule,
+    ReviewModule
   ],
   controllers: [AppController],
   providers: [AppService],

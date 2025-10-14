@@ -1,8 +1,10 @@
 
-import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, OneToMany } from "typeorm";
 import { NewsStatus, NewsType } from "../dto/create-news-post.dto";
 import { Category } from "src/category/entities/category.entity";
 import { Journalist } from "src/journalist/entities/journalist.entity";
+import { Review } from "src/review/entities/review.entity";
+import { Comment } from "src/comment/entities/comment.entity";
 
 @Entity({ name: 'news_post' })
 export class NewsPost {
@@ -24,7 +26,7 @@ export class NewsPost {
   journalist: Journalist;
 
   @Column({ type: 'enum', enum: NewsType })
-  news_type: string;
+  news_type: NewsType;
 
   @Column()
   news_title: string;
@@ -46,4 +48,10 @@ export class NewsPost {
 
   @UpdateDateColumn({ type: 'timestamp with time zone' })
   updated_at: Date;
+
+  @OneToMany(() => Comment, (comment) => comment.news_post)
+  comments: Comment[];
+
+  @OneToMany(() => Review, (review) => review.news_post)
+  reviews: Review[];
 }

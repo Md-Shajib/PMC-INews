@@ -17,8 +17,67 @@ export class NewsPostService {
     private newsPostRepository: Repository<NewsPost>,
   ) {}
 
-  async paginate(options: IPaginationOptions): Promise<Pagination<NewsPost>> {
-    return paginate<NewsPost>(this.newsPostRepository, options);
+  async paginateFindAll(
+    page = 1,
+    limit = 10,
+    search?: string,
+    status?: string,
+  ): Promise<{
+    data: any[];
+    meta: { total: number; page: number; limit: number; totalPages: number };
+  }> {
+    const skip = (page - 1) * limit;
+
+    const query = this.newsPostRepository
+      .createQueryBuilder('news_post')
+      .leftJoin('news_post.journalist', 'journalist')
+      .loadRelationCountAndMap('news_post.comment_count', 'news_post.comments')
+      .loadRelationCountAndMap('news_post.review_count', 'news_post.reviews')
+      .select([
+        'news_post.id',
+        'news_post.category_id',
+        'news_post.journalist_id',
+        'news_post.news_type',
+        'news_post.news_title',
+        'news_post.news_body',
+        'news_post.media_link',
+        'news_post.views',
+        'news_post.status',
+        'news_post.created_at',
+        'news_post.updated_at',
+      ])
+      .addSelect([
+        'journalist.name',
+        'journalist.email',
+        'journalist.image_url',
+        'journalist.status',
+      ])
+      .orderBy('news_post.created_at', 'DESC')
+      .skip(skip)
+      .take(limit);
+
+    if (search) {
+      query.andWhere(
+        '(news_post.news_title ILIKE :search OR news_post.news_body ILIKE :search)',
+        { search: `%${search}%` },
+      );
+    }
+
+    if (status) {
+      query.andWhere('news_post.status = :status', { status });
+    }
+
+    const [data, total] = await query.getManyAndCount();
+
+    return {
+      data,
+      meta: {
+        total,
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async create(createNewsPostDto: CreateNewsPostDto): Promise<NewsPost> {
