@@ -126,7 +126,7 @@ export class JournalistService {
 
   async findAllMinimal() {
     const journalists = await this.journalistRepository.find({
-      select: ['id', 'name'],
+      select: ['id', 'name', 'email', 'image_url'],
       where: { status: JournalistStatus.ACTIVE },
       order: { name: 'ASC' },
     });
