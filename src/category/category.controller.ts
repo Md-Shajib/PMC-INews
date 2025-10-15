@@ -31,6 +31,12 @@ export class CategoryController {
     return this.categoryService.findAll({ page, limit, search, status });
   }
 
+  @Get('minimal')
+  @Roles(Role.Admin, Role.Journalist)
+  findAllMinimal() {
+    return this.categoryService.findAllMinimal();
+  }
+
   @Get('total')
   @Roles(Role.Admin, Role.Journalist)
   countCategory() {

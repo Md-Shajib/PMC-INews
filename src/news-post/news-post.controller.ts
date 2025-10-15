@@ -127,7 +127,7 @@ export class NewsPostController {
     return this.newsPostService.viewIncrement(id);
   }
 
-  @Patch(':id/update')
+  @Patch(':id')
   update(
     @Param('id') id: string,
     @Body() updateNewsPostDto: UpdateNewsPostDto,
@@ -135,7 +135,7 @@ export class NewsPostController {
     return this.newsPostService.update(id, updateNewsPostDto);
   }
 
-  @Delete(':id/delete')
+  @Delete(':id')
   remove(@Param('id') id: string) {
     return this.newsPostService.remove(id);
   }

@@ -10,7 +10,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateJournalistDto } from './dto/create-journalist.dto';
 import { UpdateJournalistDto } from './dto/update-journalist.dto';
-import { Journalist } from './entities/journalist.entity';
+import { Journalist, JournalistStatus } from './entities/journalist.entity';
 
 @Injectable()
 export class JournalistService {
@@ -122,6 +122,18 @@ export class JournalistService {
         totalPages: Math.ceil(total / limit),
       },
     };
+  }
+
+  async findAllMinimal() {
+    const journalists = await this.journalistRepository.find({
+      select: ['id', 'name'],
+      where: { status: JournalistStatus.ACTIVE },
+      order: { name: 'ASC' },
+    });
+    if (journalists.length === 0) {
+      throw new NotFoundException('No journalist found!');
+    }
+    return journalists;
   }
 
   async findOne(id: string) {

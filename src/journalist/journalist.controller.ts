@@ -33,6 +33,12 @@ export class JournalistController {
     return this.journalistService.paginateFindAll(page, limit, search);
   }
 
+  @Get('minimal')
+  @Roles(Role.Admin)
+  findAllMinimal() {
+    return this.journalistService.findAllMinimal();
+  }
+
   // get total journalist api
   @Get('/total')
   @Roles(Role.Admin)

@@ -6,7 +6,7 @@ import {
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Category } from './entities/category.entity';
+import { Category, CategoryStatus } from './entities/category.entity';
 import { Repository } from 'typeorm';
 import { IPaginationOptions, paginate } from 'nestjs-typeorm-paginate';
 
@@ -94,6 +94,18 @@ export class CategoryService {
         totalPages: Math.ceil(total / limit),
       },
     };
+  }
+
+  async findAllMinimal() {
+    const categories = await this.categoryRepository.find({
+      select: ['id', 'name'],
+      where: { status: CategoryStatus.ACTIVE },
+      order: { name: 'ASC' },
+    });
+    if (categories.length === 0) {
+      throw new NotFoundException('No category found!');
+    }
+    return categories;
   }
 
   async countCategory() {
