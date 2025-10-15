@@ -17,6 +17,7 @@ import { ContactModule } from './contact/contact.module';
 import { TeamMemberModule } from './team-member/team-member.module';
 import { ContentModule } from './content/content.module';
 import { ReviewModule } from './review/review.module';
+import { PollModule } from './poll/poll.module';
 
 
 @Module({
@@ -50,7 +51,8 @@ import { ReviewModule } from './review/review.module';
     ContactModule,
     TeamMemberModule,
     ContentModule,
-    ReviewModule
+    ReviewModule,
+    PollModule
   ],
   controllers: [AppController],
   providers: [AppService],
