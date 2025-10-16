@@ -5,6 +5,7 @@ import { Category } from "src/category/entities/category.entity";
 import { Journalist } from "src/journalist/entities/journalist.entity";
 import { Review } from "src/review/entities/review.entity";
 import { Comment } from "src/comment/entities/comment.entity";
+import { ViewLog } from "./view-logs.entity";
 
 @Entity({ name: 'news_post' })
 export class NewsPost {
@@ -54,4 +55,7 @@ export class NewsPost {
 
   @OneToMany(() => Review, (review) => review.news_post)
   reviews: Review[];
+
+  @OneToMany(() => ViewLog, (viewLog) => viewLog.news)
+  view_logs: ViewLog[];
 }

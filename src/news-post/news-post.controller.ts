@@ -10,7 +10,10 @@ import {
   Query,
 } from '@nestjs/common';
 import { NewsPostService } from './news-post.service';
-import { CreateNewsPostDto } from './dto/create-news-post.dto';
+import {
+  CreateNewsPostDto,
+  CreateViewLogDto,
+} from './dto/create-news-post.dto';
 import { UpdateNewsPostDto } from './dto/update-news-post.dto';
 import { Public, Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/enum/role.enume';
@@ -32,6 +35,12 @@ export class NewsPostController {
   }
 
   @Public()
+  @Post('view')
+  createViewLog(@Body() createViewLogDto: CreateViewLogDto) {
+    return this.newsPostService.createViewLog(createViewLogDto);
+  }
+
+  @Public()
   @Get()
   async findAll(
     @Query('page') page: number = 1,
@@ -39,10 +48,15 @@ export class NewsPostController {
     @Query('search') search?: string,
     @Query('status') status?: string,
   ) {
-    limit = limit > 100 ? 100 : limit; // optional max limit safeguard
-    // console.log("News Post Controller", { page, limit, search, status });
-    
-    return this.newsPostService.paginateFindAll( page, limit, search, status );
+    limit = limit > 100 ? 100 : limit;
+    return this.newsPostService.paginateFindAll(page, limit, search, status);
+  }
+
+  // admin dashboard stats
+  @Get('dashboard')
+  @Roles(Role.Admin)
+  async dashboardStatistics(@Query('year') year: number = new Date().getFullYear()) {
+    return this.newsPostService.dashboardStatistics(year);
   }
 
   // admin (all published)
@@ -78,7 +92,7 @@ export class NewsPostController {
   //   return this.newsPostService.paginatePublished('archived', { page, limit });
   // }
 
-   // admin (all archived)
+  // admin (all archived)
   @Get('banned')
   @Roles(Role.Admin)
   async findAllBanned(

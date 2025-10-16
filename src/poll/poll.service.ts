@@ -89,7 +89,7 @@ export class PollService {
       .take(limit);
 
     if (search) {
-      query.andWhere('poll.question ILIKE :search', { search: `%${search}%` });
+      query.andWhere('poll.title ILIKE :search', { search: `%${search}%` });
     }
     if (status) {
       query.andWhere('poll.status = :status', { status });

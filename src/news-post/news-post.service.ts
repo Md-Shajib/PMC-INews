@@ -1,5 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateNewsPostDto } from './dto/create-news-post.dto';
+import {
+  CreateNewsPostDto,
+  CreateViewLogDto,
+  NewsStatus,
+} from './dto/create-news-post.dto';
 import { UpdateNewsPostDto } from './dto/update-news-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { NewsPost } from './entities/news-post.entity';
@@ -9,12 +13,27 @@ import {
   IPaginationOptions,
   Pagination,
 } from 'nestjs-typeorm-paginate';
+import {
+  Journalist,
+  JournalistStatus,
+} from 'src/journalist/entities/journalist.entity';
+import { User, UserStatus } from 'src/users/entities/user.entity';
+import { ViewLog } from './entities/view-logs.entity';
 
 @Injectable()
 export class NewsPostService {
   constructor(
     @InjectRepository(NewsPost)
     private newsPostRepository: Repository<NewsPost>,
+
+    @InjectRepository(Journalist)
+    private journalistRepository: Repository<Journalist>,
+
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+
+    @InjectRepository(ViewLog)
+    private viewLogRepository: Repository<ViewLog>,
   ) {}
 
   async paginateFindAll(
@@ -90,6 +109,54 @@ export class NewsPostService {
     }
   }
 
+  async createViewLog(createViewLogDto: CreateViewLogDto): Promise<any> {
+    let result: any = null;
+    const { news_id, user_id } = createViewLogDto;
+    if (!news_id) {
+      throw new NotFoundException('News ID is required to log a view.');
+    }
+
+    const newsPost = await this.newsPostRepository.findOne({
+      where: { id: createViewLogDto.news_id },
+    });
+
+    if (!newsPost) {
+      throw new NotFoundException('News post not found.');
+    }
+
+    if (user_id) {
+      const user = await this.userRepository.findOne({
+        where: { id: user_id },
+      });
+      if (!user) {
+        throw new NotFoundException('User not found.');
+      }
+
+      const logs = await this.viewLogRepository.findOne({
+        where: { news_id, user_id },
+      });
+
+      if (logs) {
+        throw new NotFoundException('View already logged for this user.');
+      }
+
+      const viewLog = this.viewLogRepository.create(createViewLogDto);
+      result = await this.viewLogRepository.save(viewLog);
+
+      user.views += 1;
+      await this.userRepository.save(user);
+    }
+
+    newsPost.views += 1;
+    await this.newsPostRepository.save(newsPost);
+
+    if (!result) {
+      result = { message: 'View logged for anonymous user.' };
+    }
+
+    return result;
+  }
+
   async findAll() {
     return await this.newsPostRepository.find();
   }
@@ -137,6 +204,113 @@ export class NewsPostService {
       throw new NotFoundException('No post yet!');
     }
     return totalPosts;
+  }
+
+  async dashboardStatistics(year: number) {
+    // Basic counts
+    const [
+      totalNews,
+      totalActiveNews,
+      totalBannedNews,
+      totalJournalists,
+      totalBannedJournalists,
+      totalUsers,
+      totalBannedUsers,
+    ] = await Promise.all([
+      this.newsPostRepository.count(),
+      this.newsPostRepository.count({
+        where: { status: NewsStatus.PUBLISHED },
+      }),
+      this.newsPostRepository.count({ where: { status: NewsStatus.BANNED } }),
+      this.journalistRepository.count(),
+      this.journalistRepository.count({
+        where: { status: JournalistStatus.BANNED },
+      }),
+      this.userRepository.count(),
+      this.userRepository.count({ where: { status: UserStatus.BANNED } }),
+    ]);
+
+    // News statistics over the past 12 months
+    const newsStats = await this.newsPostRepository
+      .createQueryBuilder('news_post')
+      .select(
+        `TO_CHAR(DATE_TRUNC('month', news_post.created_at), 'YYYY-MM')`,
+        'date',
+      )
+      .addSelect('COUNT(*)', 'total_posts')
+      .where(`news_post.created_at >= NOW() - INTERVAL '12 months'`)
+      .groupBy(`DATE_TRUNC('month', news_post.created_at)`)
+      .orderBy(`DATE_TRUNC('month', news_post.created_at)`, 'ASC')
+      .getRawMany();
+
+    // Map results to ensure all 12 months are represented
+    const newsStatistics = Array.from({ length: 12 }, (_, i) => {
+      const date = new Date();
+      date.setMonth(date.getMonth() - (11 - i));
+      const monthKey = date.toISOString().slice(0, 7); // 'YYYY-MM'
+      const monthData = newsStats.find((stat) => stat.date === monthKey);
+      return {
+        month: monthKey,
+        total_posts: monthData ? parseInt(monthData.total_posts, 10) : 0,
+      };
+    });
+
+    // Views statistics over the past 12 months or for the specified year
+    // Create the base query
+    const viewsQuery = this.newsPostRepository
+      .createQueryBuilder('news_post')
+      .select(
+        `TO_CHAR(DATE_TRUNC('month', news_post.created_at), 'YYYY-MM')`,
+        'date',
+      )
+      .addSelect('SUM(news_post.views)', 'total_views');
+    // Apply year filter if provided
+    if (year) {
+      viewsQuery.where(`EXTRACT(YEAR FROM news_post.created_at) = :year`, {
+        year,
+      });
+    } else {
+      viewsQuery.where(`news_post.created_at >= NOW() - INTERVAL '12 months'`);
+    }
+
+    // Fetch the data
+    const viewsStats = await viewsQuery
+      .groupBy(`DATE_TRUNC('month', news_post.created_at)`)
+      .orderBy(`DATE_TRUNC('month', news_post.created_at)`, 'ASC')
+      .getRawMany();
+
+    // Month keys for the specified year or past 12 months
+    const months = year
+      ? Array.from(
+          { length: 12 },
+          (_, i) => `${year}-${String(i + 1).padStart(2, '0')}`,
+        )
+      : Array.from({ length: 12 }, (_, i) => {
+          const d = new Date();
+          d.setMonth(d.getMonth() - (11 - i));
+          return d.toISOString().slice(0, 7); // YYYY-MM
+        });
+
+    // Map results to ensure all 12 months are represented
+    const viewsStatistics = months.map((monthKey) => {
+      const found = viewsStats.find((v) => v.date === monthKey);
+      return {
+        date: monthKey,
+        total_views: found ? parseInt(found.total_views, 10) : 0,
+      };
+    });
+
+    return {
+      totalNews,
+      totalActiveNews,
+      totalBannedNews,
+      totalJournalists,
+      totalBannedJournalists,
+      totalUsers,
+      totalBannedUsers,
+      newsStatistics,
+      viewsStatistics,
+    };
   }
 
   async paginatePublished(

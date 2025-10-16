@@ -45,3 +45,12 @@ export class CreateNewsPostDto {
 
   // created_at & updated_at are automatically handled by TypeORM
 }
+
+export class CreateViewLogDto {
+  @IsUUID()
+  news_id: string;
+
+  @IsUUID()
+  @IsOptional()
+  user_id?: string;
+}

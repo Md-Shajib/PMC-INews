@@ -1,21 +1,23 @@
+import * as bcrypt from 'bcryptjs';
 import {
   IsEmail,
   IsString,
-  Matches,
-  MaxLength,
-  MinLength,
+  MaxLength
 } from 'class-validator';
+import { Role } from 'src/auth/enum/role.enume';
 import {
   BeforeInsert,
-  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
+  UpdateDateColumn
 } from 'typeorm';
-import * as bcrypt from 'bcryptjs';
-import { Role } from 'src/auth/enum/role.enume';
+
+export enum UserStatus {
+  ACTIVE = 'active',
+  BANNED = 'banned',
+}
 
 @Entity({ name: 'users' })
 export class User {
@@ -56,4 +58,10 @@ export class User {
   async hashPassword() {
     this.password = await bcrypt.hash(this.password, 7);
   }
+
+  @Column({ type: 'enum', enum: UserStatus, default: UserStatus.ACTIVE })
+  status: UserStatus;
+
+  @Column({ type: 'int', default: 0 })
+  views: number;
 }
